@@ -1,0 +1,5 @@
+how to generate I'm feeling luck youtube search: http://www.google.com/search?q=test&btnI
+So the above should turn into this: https://www.google.com.au/search?q=Act+Your+Age+by+Bliss+N+Eso&btnI
+write a script to search a replace to get the I'm feeling lucky search URL.
+then grab the resulting URL and put it into a youtube-dl shell script. 
+
