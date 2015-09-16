@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-sed s/' with #Shazam.*'//g <../shazamtags.txt >curllinks.sh #remove everything after "with #Shazam" and creates new file. Overwrites??
+sed s/' #whatatune.*'//g <../shazamtags.txt >curllinks.sh #remove everything after "with #whatatune" and creates new file. Overwrites??
+sed -i -- s/'^'/'youtube '/ curllinks.sh # adds "youtube" to the start of the line to increase search accuracy.
+#There might be a possiblity of adding a !youtube bang to the start of the search. Not sure if this is compatible with I'm Feeling Ducky though.
 sed -i -- s/' '/'+'/g ./curllinks.sh #remove spaces
-#todo - add the word youtube to the start of the search to reduce the chances of lyrice coming up in search results. There might be a possiblity of adding a !youtube bang to the start of the search. Not sure if this is compatible with I'm Feeling Ducky though.
 sed -i -- s/'^'/'https\:\/\/duckduckgo\.com\/\?q\=\%5C'/ curllinks.sh # add the start of the Duck Duck Go "I'm feeling ducky" search URL
 sed -i -- s/'^'/'curl -Ls -w %{url_effective} '/ curllinks.sh #add the curl command to extract the redirected URL
 sed -i -- s/'$'/' >>encodedlinks.txt'/ curllinks.sh #append the end of the line so that when run, the script will append the results of curl to a file.
