@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-# some good info about sed: https://unix.stackexchange.com/questions/32907/what-characters-do-i-need-to-escape-when-using-sed-in-a-sh-script
-
 #todo remove curllinks.sh, curllinks.sh--, encodedlinks.txt and encodedlinks.txt-- files.
 sed s/' with #Shazam.*'//g <../shazamtags.txt >curllinks.sh #remove everything after "with #Shazam" and creates new file. Overwrites??
 sed -i -- s/' '/'+'/g ./curllinks.sh #remove spaces
@@ -63,13 +61,15 @@ cd ~/Desktop
 $DIR/decodedlinks.sh
 #./decodedlinks.sh
 
-#cd $DIR
-#rm decodedlinks.sh
-#rm decodedlinks.sh--
-#rm encodedlinks.txt
-#rm encodedlinks.txt--
-#rm curllinks.sh
-#rm curllinks.sh--
+echo "If you see this message, then the youtube-dl scipt was successuflly run and the script will now delete the temporary files. Hit return to continue"
+read dummy_variable #wait for user input so I can check the encodedlinks.txt file
+cd $DIR
+rm decodedlinks.sh
+rm decodedlinks.sh--
+rm encodedlinks.txt
+rm encodedlinks.txt--
+rm curllinks.sh
+rm curllinks.sh--
 
 #todo insert line to add download to log
 #todo cd to desktop before running script.
