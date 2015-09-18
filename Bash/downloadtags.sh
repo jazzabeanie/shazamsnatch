@@ -1,51 +1,21 @@
 #!/usr/bin/env bash
-sed s/' #whatatune.*'//g <../shazamtags.txt >curllinks.sh #remove everything after "with #whatatune" and creates new file. Overwrites??
-sed -i -- s/'^'/'youtube '/ curllinks.sh # adds "youtube" to the start of the line to increase search accuracy.
-#There might be a possiblity of adding a !youtube bang to the start of the search. Not sure if this is compatible with I'm Feeling Ducky though.
-sed -i -- s/' '/'+'/g ./curllinks.sh #remove spaces
-sed -i -- s/'^'/'https\:\/\/duckduckgo\.com\/\?q\=\%5C'/ curllinks.sh # add the start of the Duck Duck Go "I'm feeling ducky" search URL
-sed -i -- s/'^'/'curl -Ls -w %{url_effective} '/ curllinks.sh #add the curl command to extract the redirected URL
-sed -i -- s/'$'/' >>encodedlinks.txt'/ curllinks.sh #append the end of the line so that when run, the script will append the results of curl to a file.
-sed -i -- s/'\&'/'and'/ curllinks.sh #remove special character &
-sed -i -- s/'+\-+'/'+'/g curllinks.sh #remove dashes
-sed -i -- s/[\(\)]/''/g curllinks.sh #remove parenteses, though I thought you didn't have to escape parentesis, so I'm not sure why this works. 
-#todo remove other special characters that will cause sintax error as above with &
-
-#the following lines are my attempt to put the result of each curl on a new line, not sure why it's not working. this is todo.
-sed -i -- s/'$'/'\
-echo -e "\\n" >>encodedlinks.txt'/ curllinks.sh
-#sed -i -- s/'$'/'\
-#'/g curllinks.sh 
-
-rm -f encodedlinks.txt #removes existing file (if exists) and silences errors.
-touch encodedlinks.txt #creates file for curllinks.sh to append to
-chmod 700 curllinks.sh #set executable
-./curllinks.sh #executes script
-sed -i -- s/'\<html\>.*uddg='/''/g encodedlinks.txt #removes text before encoded URL
-sed -i -- 's/'\'');}set.*$//g' encodedlinks.txt # removes test after enconded URL
-
-rm -f decodedlinks.sh #removes file if exists
-#decodes each link with the urldecode.sh file
-while read LINK 
+cd ~/Dropbox/Music/whatatune/Bash
+while read TWEET
 do
-        ./urldecode.sh $LINK >>decodedlinks.sh
-done < encodedlinks.txt
-
-sed -i -- s/'^'/'youtube-dl -x '/ decodedlinks.sh #adds the youtube-dl prefix with -x to specify audio.
-chmod 700 decodedlinks.sh
-brew upgrade youtube-dl
-DIR=$(pwd)
-cd ~/Desktop #so that files are downloaded to the desktop
-$DIR/decodedlinks.sh
-
-echo "If you see this message, then the youtube-dl scipt was successuflly run and the script will now delete the temporary files. Hit return to continue"
-read dummy_variable #wait for user input so I can check the encodedlinks.txt file
-cd $DIR
-rm decodedlinks.sh
-rm decodedlinks.sh--
-rm encodedlinks.txt
-rm encodedlinks.txt--
-rm curllinks.sh
-rm curllinks.sh--
-
-#todo insert line to add download to log
+        SONG=$(echo $TWEET | sed s/' #whatatune.*'//g) #removes everything after " #whatatune". The tweet should be in the format "song by artist #whatatune etc"
+        SONGPLUS=$(echo $SONG | sed s/' '/'+'/g) #replaces + (plus) with spaces
+        SEARCHURL='https://duckduckgo.com/?q=%5Cyoutube+'$SONGPLUS #creates an I'm Feeling Ducky search URL
+        HEADER=$(curl -Ls -w %{url_effective} $SEARCHURL) #follows the link, extracts the header information, and assigns it to a variable
+        #todo remove special characters, &, -, (, ), etc. This step may notactually be necessary
+        LINK=$(echo $HEADER | sed s/'\<html\>.*uddg='/''/g) #removes everything before the final destination link
+        LINK=$(echo $LINK | sed 's/'\'');}set.*$//g') #removes everything after final destination link
+        LINK=$(./urldecode.sh $LINK) #decodes link
+        #todo remove the dependancy for the urldecode.sh file. https://stackoverflow.com/questions/890262/integer-ascii-value-to-character-in-bash-using-printf
+        CURRENTDIR=`pwd`
+        cd ~/Desktop
+        youtube-dl -x $LINK #downloads audio from link
+        cd $CURRENTDIR
+        echo "$SONG, $LINK, $TWEET, `date`" >> downloads.csv
+        #todo sort out the double lines issue. This occurs if a video doesn't completely download. Is there any other time where this happens?
+        #todo delete line from file
+done < ../shazamtags.txt
